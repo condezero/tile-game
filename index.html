@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break the Tiles</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+    <h1>Break the Tiles</h1>
+    <p>Break the tiles following the jump rules.</p>
+    
+    <div class="grid" id="grid"></div>
+
+    <div class="info">
+      
+        <h2 id="timer">Tiempo: 00:00:00</h2> 
+         <div id="status">Movimiento siguiente: 1</div>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+    <script>
+        const size = 5;
+        let currentNum = 1;
+        let lastPos = null;
+        let board = Array(size * size).fill(null);
+        let timer = null;
+        let startTime = null;
+
+        const gridElement = document.getElementById('grid');
+        const statusElement = document.getElementById('status');
+
+        function createGrid() {
+            gridElement.innerHTML = '';
+            for (let i = 0; i < size * size; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.onclick = () => handleMove(i);
+                gridElement.appendChild(cell);
+            }
+            updateBoard();
+        }
+
+        function handleMove(index) {
+            if (board[index] !== null) return;
+
+            const cell = document.querySelector(`.cell[data-index="${index}"]`);
+            if (currentNum === 1 || isValidMove(index)) {
+                if (currentNum === 1) startGame();
+                cell.classList.add('breaking');
+                cell.addEventListener('animationend', () => {
+                    cell.classList.remove('breaking');
+                    board[index] = true;
+                    lastPos = index;
+                    currentNum++;
+                    updateBoard();
+                    checkGameOver();
+                }, {once: true});
+            }
+        }
+
+        function isValidMove(index) {
+            if (lastPos === null) return true;
+            
+            const r1 = Math.floor(lastPos / size), c1 = lastPos % size;
+            const r2 = Math.floor(index / size), c2 = index % size;
+            
+            const rowDiff = Math.abs(r1 - r2);
+            const colDiff = Math.abs(c1 - c2);
+
+            // Regla: 3 casillas (salto de 2) en H/V, o 2 casillas (salto de 1) en diagonal
+            const horizontalVertical = (rowDiff === 3 && colDiff === 0) || (rowDiff === 0 && colDiff === 3);
+            const diagonal = (rowDiff === 2 && colDiff === 2);
+
+            return horizontalVertical || diagonal;
+        }
+
+        function updateBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, i) => {
+                cell.textContent = board[i] ? '✓' : '';
+                cell.className = 'cell';
+                if (board[i]) cell.classList.add('marked');
+                if (i === lastPos) cell.classList.add('last');
+                if (board[i] === null && (currentNum === 1 || isValidMove(i))) {
+                    cell.classList.add('valid');
+                }
+            });
+            statusElement.textContent = currentNum > 25 ? "Completed!" : `Next move: ${currentNum}`;
+            if (currentNum > 25 && timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+
+        function checkGameOver() {
+            if (currentNum > 25) return;
+            const hasMoves = board.some((val, i) => val === null && isValidMove(i));
+            if (!hasMoves && currentNum > 1) {
+                statusElement.textContent = `Blocked on move ${currentNum - 1}! Try again.`;
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+        }
+
+        function resetGame() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            startTime = null;
+            board = Array(size * size).fill(null);
+            currentNum = 1;
+            lastPos = null;
+            document.getElementById('timer').textContent = 'Tiempo: 00:00:00';
+            createGrid();
+        }
+
+        createGrid();
+
+        document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+        function startGame() {
+            if (timer) return;
+            startTime = Date.now();
+            timer = setInterval(updateTimer, 100);
+        }
+
+        function updateTimer() {
+            const elapsed = Date.now() - startTime;
+            const min = Math.floor(elapsed / 60000);
+            const sec = Math.floor((elapsed % 60000) / 1000);
+            const ms = Math.floor((elapsed % 1000) / 10);
+            document.getElementById('timer').textContent = `Tiempo: ${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}:${ms.toString().padStart(2,'0')}`;
+        }
+        </script>
+</body>
+</html>
