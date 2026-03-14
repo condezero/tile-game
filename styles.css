@@ -3,56 +3,17 @@ h1 { color: #333; font-size: 1.5rem; text-align: center; }
 p { text-align: center; margin: 10px 0; }
 .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-width: min(90vw, 500px); width: 100%; margin: 20px auto; }
 .cell { aspect-ratio: 1; background: white; border: 2px solid #ccc; display: flex; 
-        align-items: center; justify-content: center; font-weight: bold; font-size: clamp(0.8rem, 4vw, 1.2rem); 
-        cursor: pointer; border-radius: 8px; transition: 0.2s; box-sizing: border-box; position: relative; }
-.cell.valid { background: #e1f5fe; border-color: #03a9f4; animation: pulse 1.5s infinite; }
-.cell.marked { background: #ccc; color: #000; transition: all 0.3s ease; }
-.cell.last { background: #ccc; border: 2px dashed #999; color: #666; }
-.cell.breaking { animation: break 0.5s ease-out; }
-.cell.breaking::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 50%;
-    background: white;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    animation: shard1 0.5s ease-out;
-    z-index: 1;
-}
-.cell.breaking::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 50%;
-    height: 50%;
-    background: white;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    animation: shard2 0.5s ease-out;
-    z-index: 1;
-}
+        align-items: center; justify-content: center; font-weight: bold; font-size: clamp(1.2rem, 6vw, 2rem); 
+        cursor: pointer; border-radius: 8px; transition: 0.2s; box-sizing: border-box; }
+.cell.marked { background: black; color: yellow; transition: all 0.3s ease; }
+.cell.last { background: black; border: 2px dashed #666; color: yellow; }
+.cell.wrong { animation: wrong 0.5s; }
+.popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: green; padding: 20px; border-radius: 10px; display: none; font-size: 2rem; z-index: 10; }
 .cell.breaking { animation: break 0.5s ease-out; }
 .info { margin-top: 20px; text-align: center; }
 button { padding: 10px 20px; cursor: pointer; background: #333; color: white; border: none; border-radius: 5px; font-size: 1rem; }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-@keyframes break {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-}
-@keyframes shard1 {
-    0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
-    100% { transform: translate(-40px, -40px) rotate(-90deg) scale(0.3); opacity: 0; }
-}
-@keyframes shard2 {
-    0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
-    100% { transform: translate(40px, 40px) rotate(90deg) scale(0.3); opacity: 0; }
-}
-@media (max-width: 600px) {
-    h1 { font-size: 1.2rem; }
-    .grid { gap: 5px; max-width: 95vw; }
-    .cell { border-radius: 4px; }
+@keyframes wrong {
+    0% { border-color: red; }
+    50% { border-color: red; }
+    100% { border-color: #ccc; }
 }
